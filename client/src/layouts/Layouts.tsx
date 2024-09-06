@@ -11,7 +11,7 @@ export function MainLayout({
   return (
     <div className="bg-gradient-2">
       {children}
-      <HomeFooterNav active={active} />
+      {/* <HomeFooterNav active={active} /> */}
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import TopNavBarWrapper from "../../../components/TopNavBarWrapper";
 import HeaderLogo from "../../../components/HeaderLogo";
+import TopHeader from './topHeader';
+
 
 export default function HomeHeader({ installPWA }: { installPWA: any }) {
   const handleInstallClick = () => {
@@ -14,7 +16,7 @@ export default function HomeHeader({ installPWA }: { installPWA: any }) {
       {/* Header */}
 
       <TopNavBarWrapper>
-        <div className="left-content">
+        {/* <div className="left-content">
           <HeaderLogo />
           <h4 className="title mb-0">Home</h4>
         </div>
@@ -37,7 +39,7 @@ export default function HomeHeader({ installPWA }: { installPWA: any }) {
             >
               <i className="fa fa-download text-primary"></i>
             </a>
-          )}
+          )} */}
           {/* <a href="reels" className="bell-icon me-2">
             <svg
               id="Layer_3"
@@ -112,8 +114,17 @@ export default function HomeHeader({ installPWA }: { installPWA: any }) {
               <path d="M15,21h4c1.1,0,2-0.9,2-2v-4c0-1.1-0.9-2-2-2h-4c-1.1,0-2,0.9-2,2v4C13,20.1,13.9,21,15,21z" />
             </svg>
           </a> */}
-        </div>
+          
+        {/* </div> */}
+
+        {/* <div id="wrapper"> */}
+
+        <TopHeader/>
+      {/* </div> */}
+
       </TopNavBarWrapper>
+
+
       <div className="dark-overlay"></div>
       {/* Header End  */}
     </>

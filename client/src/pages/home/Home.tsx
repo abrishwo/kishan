@@ -2,7 +2,10 @@ import { useEffect, useState, useRef } from "react";
 import PageLoading from "../../components/PageLoading";
 import HomeHeader from "./components/HomeHeader";
 import StoryBar from "./components/container/StoryBar";
+import Stories from "./components/container/Stories/Stories";
 import PostsContainer from "./components/container/PostsContainer";
+import SidebarContainer from "./components/ui/sidebar/SidebarContainer";
+import Sidebar from "./components/ui/sidebar/Sidebar";
 import { get } from "../../services/crud";
 import BlinkingLoadingCircles from "../../components/BlinkingLoadingCircles";
 import { useBgdImgStore, usePostStore } from "../../store";
@@ -15,8 +18,14 @@ import {
 } from "../../services/config-data";
 import { formatResourceURL } from "../../services/asset-paths";
 import { isLoggedIn } from "../../services/auth";
-
-export default function Home() {
+import FeedStory from "./components/container/Stories/StoryFeeds";
+import OpenChatBox from "./components/ui/chat/OpenChatBox";
+import CreateStatus from "./components/ui/chat/CreateStatus";
+import CreateStory from "./components/container/Stories/CreateStory";
+// import SideBar from "../../components/SideBar";
+import { Link, useParams } from "react-router-dom";
+export default function Home({ active }: { active?: string }) {
+  const params = useParams();
   const installPWA: any = usePwaInstallPrompt();
 
   const [pageLoading, setPageLoading] = useState(true);
@@ -53,7 +62,7 @@ export default function Home() {
   const handleScroll = async () => {
     if (
       window.innerHeight + document.documentElement.scrollTop >=
-        document.documentElement.offsetHeight - 5 &&
+      document.documentElement.offsetHeight - 5 &&
       !loadingAdditionalPosts.current
     ) {
       loadingAdditionalPosts.current = true;
@@ -109,30 +118,64 @@ export default function Home() {
 
   return (
     <>
+    <div id="wrapper">
       <HomeHeader installPWA={installPWA} />
 
+      <SidebarContainer />
+
       {/* Page Content  */}
-      <div
+      {/* <div
         className="page-content min-vh-100 background-image"
         style={{ background: `url(${bgdImage})` }}
       >
         <div className="content-inner pt-0">
           <div className="container bottom-content">
             {/* STORY  */}
-            {isLoggedIn() && <StoryBar />}
+      {/* {isLoggedIn() && <StoryBar />} */}
 
-            {/* POSTS */}
-            <PostsContainer feed={posts} />
+      {/* POSTS */}
+      {/* <PostsContainer feed={posts} /> */}
 
-            {postsLoading && <BlinkingLoadingCircles />}
+      {/* {postsLoading && <BlinkingLoadingCircles />} */}
 
-            <ShareModal />
-          </div>
+      {/* <ShareModal /> */}
+      {/* </div>
         </div>
-      </div>
+      </div> */}
       {/* Page Content End */}
 
+      {/* <!-- main contents --> */}
+      <main id="site__main" className="2xl:ml-[--w-side]  xl:ml-[--w-side-sm] p-2.5 h-[calc(100vh-var(--m-top))] mt-[--m-top]">
+
+        {/* <!-- timeline --> */}
+        <div className="lg:flex 2xl:gap-16 gap-12 max-w-[1065px] mx-auto" id="js-oversized">
+
+          <div className="max-w-[680px] mx-auto">
+            {/* <!-- stories --> */}
+            {/* {isLoggedIn() && <StoryBar />} */}
+           {isLoggedIn() &&  <Stories />}
+{/* <PostsContainer feed={posts} /> */}
+            <FeedStory feed={posts}/>
+            <ShareModal /> 
+            </div>
+
+            <Sidebar /> 
+        </div>
+
+       
+      </main>
+
       <AddPWA installPWA={installPWA} />
+    </div>
+    {/* open chat box  */}
+    
+   
+            <OpenChatBox />
+          
+
+    <CreateStatus />
+    <CreateStory />
     </>
+
   );
 }
