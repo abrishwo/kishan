@@ -11,6 +11,7 @@ import ReportModal from "../../../../../components/ReportModal";
 import { toast } from "react-toastify";
 
 import { EllipsisHorizontal, BookmarkOutline, NotificationsOffOutline, FlagOutline, ShareOutline, StopCircleOutline, Heart, ChatbubbleEllipses, PaperPlaneOutline, ShareOutline as shareOutlineIcon, ImageOutline,VideocamOutline } from "react-ionicons";
+import CreateStatus from '../../ui/chat/CreateStatus';
 
 interface PostContainerProps {
   feed: any[];
@@ -28,8 +29,14 @@ interface PostContainerProps {
     const componentRefs = useRef<{ [key: string]: HTMLElement }>({});
     const postToReport = useReportStore((state) => state.post);
     const togglePostLike = usePostStore((state) => state.togglePostLike);
+    const [openPostModal, setOpenPostModal] = useState(false);
+
+
     const navigate = useNavigate();
   
+    const postModalTogler = ()=>{
+      setOpenPostModal(!openPostModal);
+    }
     const toggleComment = (id: string) => {
       if (visibleComment === id) {
         setVisibleComment(null);
@@ -94,8 +101,8 @@ interface PostContainerProps {
       <div className="bg-white shadow-sm md:p-4 p-2 space-y-4 text-sm font-medium border1 dark:bg-dark2">
         <div className="flex items-center md:gap-3 gap-1">
           {/* Input Story */}
-          <div className="flex-1 bg-slate-100 hover:bg-opacity-80 transition-all rounded-lg cursor-pointer dark:bg-dark3 px-3" uk-toggle="target: #create-status"> 
-                                    <div className="py-2.5 text-center dark:text-white"> What do you have in mind? </div>
+          <div className="flex-1 bg-slate-100 hover:bg-opacity-80 transition-all rounded-lg cursor-pointer dark:bg-dark3 px-3"  uk-toggle="target: #create-status"> 
+                                    <div className="py-2.5 text-center dark:text-white" onClick={postModalTogler}> What do you have in mind? </div>
                                 </div>
 
           {/* Icon Buttons */}
@@ -134,6 +141,7 @@ interface PostContainerProps {
         ))}
    </div>
    <ReportModal reportPost={reportPost} />
+   {openPostModal && <CreateStatus />}
     </div>
   );
 };

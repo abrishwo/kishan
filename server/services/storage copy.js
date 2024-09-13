@@ -1,6 +1,7 @@
 const GridFsStorage = require("multer-gridfs-storage");
 const crypto = require("crypto");
 const multer = require("multer");
+// const upload = multer({ dest: 'uploads/' }); 
 const path = require("path");
 
 // Create Storage Engine
@@ -14,7 +15,7 @@ const storage = new GridFsStorage({
         }
         const filename = buf.toString("hex") + path.extname(file.originalname);
         const bucketName = file.fieldname === 'chat_files' ? 'chat_files' : "media";
-
+        
         const fileInfo = {
           filename: filename,
           bucketName: bucketName,
@@ -25,7 +26,4 @@ const storage = new GridFsStorage({
   },
 });
 
-// Initialize upload middleware using multer
-const upload = multer({ storage });  // Correct usage of storage
-
-module.exports = { upload };
+module.exports.upload = multer({ dest: storage });

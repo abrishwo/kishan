@@ -121,7 +121,7 @@ export default function Home({ active }: { active?: string }) {
     <div id="wrapper">
       <HomeHeader installPWA={installPWA} />
 
-      <SidebarContainer />
+      {/* <SidebarContainer /> */}
 
       {/* Page Content  */}
       {/* <div
@@ -169,12 +169,14 @@ export default function Home({ active }: { active?: string }) {
     </div>
     {/* open chat box  */}
     
-   
+  
+
+
             <OpenChatBox />
           
 
-    <CreateStatus />
-    <CreateStory />
+    
+    {/* <CreateStory /> */}
     </>
 
   );

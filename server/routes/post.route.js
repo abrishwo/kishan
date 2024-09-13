@@ -12,12 +12,23 @@ router.get("/tag-wise/:hashtag", postsController.getPostsByHashtags);
 router.get("/:postId", postsController.getPost);
 
 //post
+// app.post('/api/post', upload.fields([{ name: 'file', maxCount: 1 }]), postController.create);
+
+// router.post(
+//   "/",
+//   authGuard,
+//   upload.fields([{ name: 'file'}, { name: "thumbnail" }]),
+//   postsController.create
+// );
+
 router.post(
   "/",
   authGuard,
-  upload.fields([{ name: "file" }, { name: "thumbnail" }]),
+  upload.fields([{ name: 'file', maxCount: 1 }, { name: 'thumbnail', maxCount: 1 }]),  // Specify maxCount for each field
   postsController.create
 );
+
+
 router.post("/like/:postId", authGuard, postsController.likePost);
 router.post("/unlike/:postId", authGuard, postsController.unlikePost);
 

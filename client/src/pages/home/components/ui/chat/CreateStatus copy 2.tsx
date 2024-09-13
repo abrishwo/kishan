@@ -19,34 +19,26 @@ interface ConfigData {
   };
 }
 
-export default function CreateStatus({
-  allowedTypes = "any",
-  competitionId = null,
-  round = null,
-}: {
-  allowedTypes?: "image" | "video" | "any";
-  competitionId?: string | null;
-  round?: number | null;
-}) {
-  const [postBtnDisabled, setPostBtnDisabled] = useState(true);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [thumbnail, setThumbnail] = useState(null);
-  const [caption, setCaption] = useState("");
-  const [fileType, setFileType] = useState<"video" | "image">("image");
-  const photoInputRef = useRef<any>(null);
-  const videoInputRef = useRef<any>(null);
-  const thumbnailInputRef = useRef<any>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploading, setUploading] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [configData, setConfigData] = useState<any>({});
-  const [videoLength, setVideoLength] = useState(0);
-  const [errorMessage, setErrorMessage] = useState("");
+const CreateStatus: React.FC = () => {
+  const [postBtnDisabled, setPostBtnDisabled] = useState<boolean>(true);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [caption, setCaption] = useState<string>('');
+  const [fileType, setFileType] = useState<'video' | 'image'>('image');
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [configData, setConfigData] = useState<ConfigData>({});
+  const [videoLength, setVideoLength] = useState<number>(0);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
+  const videoInputRef = useRef<HTMLInputElement | null>(null);
+  const thumbnailInputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (competitionId) getConfigurationData();
+    getConfigurationData();
   }, []);
 
   useEffect(() => {
@@ -54,190 +46,152 @@ export default function CreateStatus({
       validateMedia();
     } else {
       setPostBtnDisabled(true);
-      setErrorMessage("");
+      setErrorMessage('');
     }
-  }, [selectedFile]);
-
-  useEffect(() => {
-    validateMedia();
-  }, [videoLength]);
-
-  useEffect(() => {
-    if (thumbnail) {
-      validateMedia();
-    }
-  }, [thumbnail]);
+  }, [selectedFile, videoLength, thumbnail]);
 
   const getConfigurationData = () => {
     setLoading(true);
-    get("configuration", {
-      keys: [
-        "max_image_upload_size",
-        "max_video_upload_size",
-        "max_video_duration",
-      ],
+    get('configuration', {
+      keys: ['max_image_upload_size', 'max_video_upload_size', 'max_video_duration'],
     })
       .then((res) => {
         if (res.data?.length > 0) {
-          const data: any = {};
-          for (const entry of res.data) {
-            data[entry.key] = entry;
-          }
+          const data: ConfigData = {};
+          res.data.forEach((entry: { key: string; value: number; unit: string }) => {
+            data[entry.key] = entry; // Ensure the structure matches ConfigData type
+          });
           setConfigData(data);
         }
         setLoading(false);
       })
       .catch((e) => {
-        console.log(e);
+        console.error(e);
         setLoading(false);
       });
   };
 
   const openPhotoDialog = () => {
-    photoInputRef.current.value = null;
-    videoInputRef.current.value = null;
-    setFileType("image");
-    if (photoInputRef.current) photoInputRef.current.click();
+    if (photoInputRef.current) {
+      photoInputRef.current.value = '';
+      videoInputRef.current!.value = '';
+      setFileType('image');
+      photoInputRef.current.click();
+    }
   };
 
   const openVideoDialog = () => {
-    photoInputRef.current.value = null;
-    videoInputRef.current.value = null;
-    thumbnailInputRef.current.value = null;
-    setFileType("video");
-    if (videoInputRef.current) videoInputRef.current.click();
+    if (photoInputRef.current && videoInputRef.current && thumbnailInputRef.current) {
+      photoInputRef.current.value = '';
+      videoInputRef.current.value = '';
+      thumbnailInputRef.current.value = '';
+      setFileType('video');
+      videoInputRef.current.click();
+    }
   };
 
   const openThumbnailDialog = () => {
-    if (thumbnailInputRef.current) thumbnailInputRef.current.click();
+    if (thumbnailInputRef.current) {
+      thumbnailInputRef.current.click();
+    }
   };
 
-  const handlePhotoChange = (event: any) => {
-    setSelectedFile(event.target.files[0]);
+  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedFile(event.target.files ? event.target.files[0] : null);
     setThumbnail(null);
   };
 
-  const handleVideoChange = (event: any) => {
-    setSelectedFile(event.target.files[0]);
+  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedFile(event.target.files ? event.target.files[0] : null);
     setThumbnail(null);
   };
 
-  const handleThumbnailChange = (event: any) => {
-    setThumbnail(event.target.files[0]);
+  const handleThumbnailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setThumbnail(event.target.files ? event.target.files[0] : null);
   };
 
-  const handleCaptionChange = (e: any) => {
+  const handleCaptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCaption(e.target.value);
   };
 
   const handleUpload = () => {
+    console.log("working")
     if (selectedFile && validateMedia()) {
+    // if(selectedFile){
       const formData = new FormData();
-      formData.append("file", selectedFile);
-      formData.append("author", getUserId() ?? "");
-      formData.append("caption", caption);
-      formData.append("type", fileType);
-      if (thumbnail) formData.append("thumbnail", thumbnail);
-      if (competitionId) formData.append("competition", competitionId);
-      if (round !== null) formData.append("round", round.toString());
+      formData.append('files', 'selectedFile');
+      formData.append('author', getUserId() ?? '');
+      formData.append('caption', caption ?? '');
+      formData.append('type', fileType??'');
+      if (thumbnail) formData.append('thumbnail', thumbnail);
 
       setUploading(true);
 
-      upload("post", formData, onUploadProgress)
-        .then((_) => {
+      upload('post', formData, onUploadProgress)
+        .then(() => {
           setUploading(false);
-          toast.success("post uploaded successfully");
-          competitionId ? navigate(-1) : navigate("/home");
+          toast.success('Status uploaded successfully');
+          navigate('/home');
         })
         .catch((error) => {
           setUploading(false);
-          toast.error(error.response?.data?.message ?? "Error uploading file");
-          console.error("Error uploading file:", error);
+          toast.error(error.response?.data?.message ?? 'Error uploading status');
+          console.error('Error uploading status:', error);
         });
     } else {
-      toast.info("Unable to upload post!");
+      toast.info('Unable to upload status!');
     }
   };
 
-  const onUploadProgress = (event: any) => {
-    setUploadProgress(Math.round(100 * event.loaded) / event.total);
+  const onUploadProgress = (event: ProgressEvent) => {
+    setUploadProgress(Math.round((100 * event.loaded) / event.total));
   };
 
-  const clearFileSelections = () => {
-    setSelectedFile(null);
-    setThumbnail(null);
-  };
-
-  const validateMedia = () => {
+  const validateMedia = (): boolean => {
     let valid = false;
-    let errorType:
-      | "video_size"
-      | "video_duration"
-      | "image"
-      | "thumbnail"
-      | null = null;
+    let errorType: 'video_size' | 'video_duration' | 'image' | 'thumbnail' | null = null;
 
     if (selectedFile) {
-      if (fileType === "video") {
-        valid = validateVideoSize(
-          selectedFile,
-          configData["max_video_upload_size"]
-        );
-
-        errorType = !valid ? "video_size" : null;
+      if (fileType === 'video') {
+        valid = validateVideoSize(selectedFile, configData['max_video_upload_size']);
+        errorType = !valid ? 'video_size' : null;
 
         if (valid && videoLength) {
-          valid = validateVideoLength(
-            videoLength,
-            configData["max_video_duration"]
-          );
-
-          errorType = !valid ? "video_duration" : null;
+          valid = validateVideoLength(videoLength, configData['max_video_duration']);
+          errorType = !valid ? 'video_duration' : null;
         }
 
         if (thumbnail && valid) {
-          valid = validateImageSize(
-            thumbnail,
-            configData["max_image_upload_size"]
-          );
-          errorType = !valid ? "thumbnail" : null;
+          valid = validateImageSize(thumbnail, configData['max_image_upload_size']);
+          errorType = !valid ? 'thumbnail' : null;
         }
       } else {
-        valid = validateImageSize(
-          selectedFile,
-          configData["max_image_upload_size"]
-        );
-        errorType = !valid ? "image" : null;
+        valid = validateImageSize(selectedFile, configData['max_image_upload_size']);
+        errorType = !valid ? 'image' : null;
       }
-    } else {
-      valid = false;
     }
 
     setPostBtnDisabled(!valid);
-
-    setErrorMessage(valid ? "" : getErrorMessage(errorType));
-
+    setErrorMessage(valid ? '' : getErrorMessage(errorType));
     return valid;
   };
 
   const getErrorMessage = (
-    errorType: "video_size" | "video_duration" | "image" | "thumbnail" | null
-  ) => {
-    if (!errorType) {
-      return "";
-    }
+    errorType: 'video_size' | 'video_duration' | 'image' | 'thumbnail' | null
+  ): string => {
+    if (!errorType) return '';
 
     switch (errorType) {
-      case "image":
-        return `Maximum image size allowed is ${configData["max_image_upload_size"].value}${configData["max_image_upload_size"].unit}`;
-      case "thumbnail":
-        return `Maximum thumbnail size allowed is ${configData["max_image_upload_size"].value}${configData["max_image_upload_size"].unit}`;
-      case "video_size":
-        return `Maximum video size allowed is ${configData["max_video_upload_size"].value}${configData["max_video_upload_size"].unit}`;
-      case "video_duration":
-        return `Maximum video duration allowed is ${configData["max_video_duration"].value}${configData["max_video_duration"].unit}`;
+      case 'image':
+        return `Maximum image size allowed is ${configData['max_image_upload_size'].value}${configData['max_image_upload_size'].unit}`;
+      case 'thumbnail':
+        return `Maximum thumbnail size allowed is ${configData['max_image_upload_size'].value}${configData['max_image_upload_size'].unit}`;
+      case 'video_size':
+        return `Maximum video size allowed is ${configData['max_video_upload_size'].value}${configData['max_video_upload_size'].unit}`;
+      case 'video_duration':
+        return `Maximum video duration allowed is ${configData['max_video_duration'].value}${configData['max_video_duration'].unit}`;
       default:
-        return "unknown error";
+        return 'Unknown error';
     }
   };
 
@@ -246,7 +200,6 @@ export default function CreateStatus({
   }
 
   return (
-
     <div className="hidden lg:p-20 uk-open" id="create-status" uk-modal="">
     <div className="uk-modal-dialog tt relative overflow-hidden mx-auto bg-white shadow-xl rounded-lg md:w-[520px] w-full dark:bg-dark2">
       {/* Modal Header */}
@@ -275,7 +228,7 @@ export default function CreateStatus({
           rows={6}
           placeholder="What do you have in mind?"
           value={caption}
-          onChange={handleCaptionChange}
+          onChange={()=>handleCaptionChange}
         ></textarea>
       </div>
   
@@ -382,7 +335,7 @@ export default function CreateStatus({
         {/* Create Status Button */}
         <div className="flex items-center gap-2">
           <button
-            type="button"
+            type="submit"
             className={`button ${postBtnDisabled ? 'bg-slate-700' : 'bg-blue-500'} text-white py-2 px-12 text-[14px]`}
             disabled={postBtnDisabled}
             onClick={handleUpload}
@@ -393,7 +346,10 @@ export default function CreateStatus({
       </div>
     </div>
   </div>
+  
   );
-}
+};
+
+export default CreateStatus;
 
 
